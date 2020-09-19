@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
-* Студент: [Дмитрий Киршанов](https://up.htmlacademy.ru/javascript/21/user/1476617).
-* Наставник: `Неизвестно`.
+- Студент: [Дмитрий Киршанов](https://up.htmlacademy.ru/javascript/21/user/1476617).
+- Наставник: [Денис Байдаров](https://htmlacademy.ru/profile/4er).
 
 ---
 
