@@ -4,6 +4,7 @@ const PHOTOS_AMOUNT = 25;
 const AVATARS_AMOUNT = 6;
 const MIN_LIKES = 15;
 const MAX_LIKES = 235;
+const MAX_COMMENTS = 5;
 
 const COMMENTS_ARRAY = [
   `Всё отлично!`,
@@ -30,9 +31,9 @@ const NAMES_ARRAY = [
 // Вспомогательные функции для генерации данных в js-прдедставлении
 //
 
-const getRandomNumber = (max, min = 0) => {
-  // Не включая max
-  return min + Math.floor(Math.random() * max);
+const getRandomNumber = (max, min = 0, includeMax = false) => {
+  const increment = includeMax ? 1 : 0;
+  return min + Math.floor(Math.random() * (max + increment));
 };
 
 const MockupPhotoObject = function (url, description, likes, comments) {
@@ -54,7 +55,7 @@ const generateCommentContent = () => {
 };
 
 const MockupComment = function () {
-  const avatarNum = getRandomNumber(AVATARS_AMOUNT + 1, 1);
+  const avatarNum = getRandomNumber(AVATARS_AMOUNT, 1, true);
   const nameNum = getRandomNumber(NAMES_ARRAY.length);
   const message = generateCommentContent();
 
@@ -65,15 +66,15 @@ const MockupComment = function () {
 
 const createPhotoArray = (arrayLength) => {
   const photoArray = [];
-  for (let i = 0; i < arrayLength; i++) {
-    const likesAmount = getRandomNumber(MAX_LIKES + 1, MIN_LIKES);
-    const commentsAmount = Math.floor(Math.random() * 5);
+  for (let i = 1; i <= arrayLength; i++) {
+    const likesAmount = getRandomNumber(MAX_LIKES, MIN_LIKES, true);
+    const commentsAmount = getRandomNumber(MAX_COMMENTS);
     const comments = [];
     for (let j = 0; j < commentsAmount; j++) {
       comments.push(new MockupComment());
     }
     const newPhotoObject = new MockupPhotoObject(
-        `photos/${i + 1}.jpg`,
+        `photos/${i}.jpg`,
         `Тестовое фото №${i}`,
         likesAmount,
         comments
