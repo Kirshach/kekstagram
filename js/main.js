@@ -27,13 +27,13 @@ const NAMES_ARRAY = [
   `Кекс`,
 ];
 
-//
-// Вспомогательные функции для генерации данных в js-прдедставлении
-//
+// // // // // // // // // // // // // // // // // // // // // // //
+//    Задаём функции для генерации данных в js-прдедставлении     //
+// // // // // // // // // // // // // // // // // // // // // // //
 
 const getRandomNumber = (max, min = 0, includeMax = false) => {
   const increment = includeMax ? 1 : 0;
-  return min + Math.floor(Math.random() * (max + increment));
+  return min + Math.floor(Math.random() * (max - min + increment));
 };
 
 const MockupPhotoObject = function (url, description, likes, comments) {
@@ -84,9 +84,9 @@ const createPhotoArray = (arrayLength) => {
   return photoArray;
 };
 
-//
-// Вспомогательные функции для генерации DOM-элементов
-//
+// // // // // // // // // // // // // // // // // // //
+//     Задаём функции для генерации DOM-элементов     //
+// // // // // // // // // // // // // // // // // // //
 
 const createDomPictureElement = (template, pictureObject) => {
   const newPictureElement = template.cloneNode(true);
@@ -110,15 +110,86 @@ const generateDomPicturesFragment = (picturesArray) => {
   return newFragment;
 };
 
-//
-// Выполняем код
-//
 
-// Находим нужные элементы
-const picturesParentElement = document.querySelector('.pictures');
+// // // // // // // // // // // // // // // // // //
+//   Готовимся тестировать полноэкранный режим     //
+// // // // // // // // // // // // // // // // // //
 
-// Генерируем объекты и заполняем их контентом
+// Генерируем объекты превью фотографий и заполняем их контентом
 const mockupPhotosArray = createPhotoArray(PHOTOS_AMOUNT);
 const mockupPhotosFragment = generateDomPicturesFragment(mockupPhotosArray);
+
+// Берём для теста первую фотографию из массива мокап-фотографий
+const bigPictureTestObject = mockupPhotosArray[0];
+
+// Создаём html-фрагмент для добавления новых комментариев
+const bigPictureCommentsFragment = document.createDocumentFragment();
+
+for (let i = 0; i < bigPictureTestObject.comments.length; i++) {
+  // Достаём текущий комментарий из массива комментариев к фотографии
+  const currentComment = bigPictureTestObject.comments[i];
+  // Создаём новые элементы для комментария
+  const commentsNewItem = document.createElement('li');
+  const commentsAvatar = document.createElement('img');
+  const commentsParagraph = document.createElement('p');
+  // Добавляем им классы
+  commentsNewItem.className = 'social__comment';
+  commentsAvatar.className = 'social__picture';
+  commentsParagraph.className = 'social__text';
+  // Наполняем элементы нового комментария
+  commentsAvatar.src = currentComment.avatar;
+  commentsAvatar.alt = currentComment.name;
+  commentsAvatar.width = 35;
+  commentsAvatar.height = 35;
+  commentsParagraph.textContent = currentComment.message;
+  // Вкладываем элементы нового комментария в их родительский объект
+  commentsNewItem.appendChild(commentsAvatar);
+  commentsNewItem.appendChild(commentsParagraph);
+  // Родительский объект добавляем во фрагмент
+  bigPictureCommentsFragment.appendChild(commentsNewItem);
+}
+
+
+// // // // // // // // // // // // // // // // // //
+//    Проводим операции над разметкой страницы     //
+// // // // // // // // // // // // // // // // // //
+
+// //
+// Находим элементы, которые будем модифицировать
+// //
+
+// Находим контейнер превью изображений
+const picturesParentElement = document.querySelector('.pictures');
+
+// Находим элементы полноэкранного режима
+const bigPicture = document.querySelector('.big-picture');
+const bigPictureImg = bigPicture.querySelector('.big-picture__img');
+const bigPictureLikesCount = bigPicture.querySelector('.likes-count');
+const bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
+const bigPictureComments = bigPicture.querySelector('.social__comments');
+const bigPictureCaption = bigPicture.querySelector('.social__caption');
+const bigPictureCommentsCountParagraph = bigPicture.querySelector('.social__comment-count');
+const bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
+
+// //
+// Модифицируем содержание страницы
+// //
+
+// Добавляем  превью фотографий в разметку
 picturesParentElement.appendChild(mockupPhotosFragment);
 
+// Заполняем содержание окна полноэкранного режима
+bigPictureImg.src = bigPictureTestObject.url;
+bigPictureLikesCount.textContent = bigPictureTestObject.likes;
+bigPictureCommentsCount.textContent = bigPictureTestObject.comments.length;
+bigPictureCaption.textContent = bigPictureTestObject.description;
+// Добавляем фрагмент с тестовыми комментариями в разметку
+console.log(bigPictureCommentsFragment);
+bigPictureComments.appendChild(bigPictureCommentsFragment);
+// Делаем полноэкранный режим видимым по умолчанию
+bigPicture.classList.remove('hidden');
+// Прячем блоки счётчика комментариев и загрузки новых комментариев
+bigPictureCommentsCountParagraph.classList.add('hidden');
+bigPictureCommentsLoader.classList.add('hidden');
+// Блокируем прокрутку страницы при открытом модальном окне;
+document.body.classList.add('modal-open');
