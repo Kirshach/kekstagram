@@ -27,13 +27,14 @@ const NAMES_ARRAY = [
   `Кекс`,
 ];
 
-//
-// Вспомогательные функции для генерации данных в js-прдедставлении
-//
+
+// // // // // // // // // // // // // // // // // // // // // // //
+//    Задаём функции для генерации данных в js-представлении      //
+// // // // // // // // // // // // // // // // // // // // // // //
 
 const getRandomNumber = (max, min = 0, includeMax = false) => {
   const increment = includeMax ? 1 : 0;
-  return min + Math.floor(Math.random() * (max + increment));
+  return min + Math.floor(Math.random() * (max - min + increment));
 };
 
 const MockupPhotoObject = function (url, description, likes, comments) {
@@ -84,15 +85,15 @@ const createPhotoArray = (arrayLength) => {
   return photoArray;
 };
 
-//
-// Вспомогательные функции для генерации DOM-элементов
-//
+// // // // // // // // // // // // // // // // // // //
+//     Задаём функции для генерации DOM-элементов     //
+// // // // // // // // // // // // // // // // // // //
 
 const createDomPictureElement = (template, pictureObject) => {
   const newPictureElement = template.cloneNode(true);
-  const imgElement = newPictureElement.querySelector('.picture__img');
-  const likesAmountElement = newPictureElement.querySelector('.picture__likes');
-  const commentsAmountElement = newPictureElement.querySelector('.picture__comments');
+  const imgElement = newPictureElement.querySelector(`.picture__img`);
+  const likesAmountElement = newPictureElement.querySelector(`.picture__likes`);
+  const commentsAmountElement = newPictureElement.querySelector(`.picture__comments`);
 
   imgElement.src = pictureObject.url;
   likesAmountElement.textContent = pictureObject.likes;
@@ -102,7 +103,7 @@ const createDomPictureElement = (template, pictureObject) => {
 
 const generateDomPicturesFragment = (picturesArray) => {
   const newFragment = document.createDocumentFragment();
-  const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
+  const pictureTemplate = document.querySelector(`#picture`).content.querySelector(`.picture`);
   for (let i = 0; i < picturesArray.length; i++) {
     const newChildElement = createDomPictureElement(pictureTemplate, picturesArray[i]);
     newFragment.appendChild(newChildElement);
@@ -110,15 +111,85 @@ const generateDomPicturesFragment = (picturesArray) => {
   return newFragment;
 };
 
-//
-// Выполняем код
-//
 
-// Находим нужные элементы
-const picturesParentElement = document.querySelector('.pictures');
+// // // // // // // // // // // // // // // // // //
+//    Проводим операции над разметкой страницы     //
+// // // // // // // // // // // // // // // // // //
 
-// Генерируем объекты и заполняем их контентом
+// //
+//   Готовимся тестировать полноэкранный режим
+// //
+
+// Генерируем объекты превью фотографий и заполняем их контентом
 const mockupPhotosArray = createPhotoArray(PHOTOS_AMOUNT);
 const mockupPhotosFragment = generateDomPicturesFragment(mockupPhotosArray);
+
+// Находим элементы полноэкранного режима
+const picturesParentElement = document.querySelector(`.pictures`);
+const bigPicture = document.querySelector(`.big-picture`);
+const bigPictureImg = bigPicture.querySelector(`.big-picture__img img `);
+const bigPictureLikesCount = bigPicture.querySelector(`.likes-count`);
+const bigPictureCommentsCount = bigPicture.querySelector(`.comments-count`);
+const bigPictureComments = bigPicture.querySelector(`.social__comments`);
+const bigPictureCaption = bigPicture.querySelector(`.social__caption`);
+const bigPictureCommentsCountParagraph = bigPicture.querySelector(`.social__comment-count`);
+const bigPictureCommentsLoader = bigPicture.querySelector(`.comments-loader`);
+
+// Находим шаблон комментария в разметке
+const commentTemplate = document.querySelector(`.social__comment`).cloneNode(true);
+
+// Берём для теста первую фотографию из массива мокап-фотографий
+const bigPictureTestObject = mockupPhotosArray[0];
+
+//
+// Задаём функцию наполнения окна полноэкранного режима
+//
+
+const showBigPicture = function (bigPictureObject) {
+  // Готовим комментарии к размещению в разметке
+  const bigPictureCommentsFragment = document.createDocumentFragment();
+
+  for (let i = 0; i < bigPictureObject.comments.length; i++) {
+    // Достаём текущий комментарий из массива комментариев
+    const currentComment = bigPictureObject.comments[i];
+    // Клонируем шаблон комментария и находим его элементы
+    const commentsItem = commentTemplate.cloneNode(true);
+    const commentsAvatar = commentsItem.querySelector(`.social__picture`);
+    const commentsParagraph = commentsItem.querySelector(`.social__text`);
+    // Наполняем элементы нового комментария
+    commentsAvatar.src = currentComment.avatar;
+    commentsAvatar.alt = currentComment.name;
+    commentsAvatar.width = 35;
+    commentsAvatar.height = 35;
+    commentsParagraph.textContent = currentComment.message;
+    // Добавляем комментарий во фрагмент
+    bigPictureCommentsFragment.appendChild(commentsItem);
+  }
+
+  // Очищаем секцию комментариев
+  bigPictureComments.innerHTML = ``;
+  // Добавляем фрагмент с комментариями в разметку
+  bigPictureComments.appendChild(bigPictureCommentsFragment);
+  // Наполняем содержанием пост
+  bigPictureImg.src = bigPictureObject.url;
+  bigPictureLikesCount.textContent = bigPictureObject.likes;
+  bigPictureCommentsCount.textContent = bigPictureObject.comments.length;
+  bigPictureCaption.textContent = bigPictureObject.description;
+  // Прячем блоки счётчика комментариев и загрузки новых комментариев
+  bigPictureCommentsCountParagraph.classList.add(`hidden`);
+  bigPictureCommentsLoader.classList.add(`hidden`);
+  // Делаем полноэкранный режим видимым
+  bigPicture.classList.remove(`hidden`);
+  // Блокируем прокрутку страницы при открытом модальном окне;
+  document.body.classList.add(`modal-open`);
+};
+
+// //
+// Модифицируем содержание страницы
+// //
+
+// Добавляем  превью фотографий в разметку
 picturesParentElement.appendChild(mockupPhotosFragment);
 
+// Тестово вызыаем показ картинки в полноэкранном режиме
+showBigPicture(bigPictureTestObject);
