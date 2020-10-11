@@ -1,10 +1,17 @@
 "use strict";
 
+//    //    //    //    //    //    //    //    //    //
+//                                                    //
+//                       КОНСТАНТЫ                    //
+//                                                    //
+//    //    //    //    //    //    //    //    //    //
+
 const PHOTOS_AMOUNT = 25;
 const AVATARS_AMOUNT = 6;
 const MIN_LIKES = 15;
 const MAX_LIKES = 235;
 const MAX_COMMENTS = 5;
+const MAX_EFFECT_VALUE = 100;
 
 const COMMENTS_ARRAY = [
   `Всё отлично!`,
@@ -28,9 +35,29 @@ const NAMES_ARRAY = [
 ];
 
 
-// // // // // // // // // // // // // // // // // // // // // // //
-//    Задаём функции для генерации данных в js-представлении      //
-// // // // // // // // // // // // // // // // // // // // // // //
+//    //    //    //    //    //    //    //    //    //    //
+//                                                          //
+//                 ИНТЕРАКТИВНЫЕ ЭЛЕМЕНТЫ                   //
+//                                                          //
+//    //    //    //    //    //    //    //    //    //    //
+
+const bigPicture = document.querySelector(`.big-picture`);
+const bigPictureImg = bigPicture.querySelector(`.big-picture__img img `);
+const bigPictureLikesCount = bigPicture.querySelector(`.likes-count`);
+const bigPictureCommentsCount = bigPicture.querySelector(`.comments-count`);
+const bigPictureComments = bigPicture.querySelector(`.social__comments`);
+const bigPictureCaption = bigPicture.querySelector(`.social__caption`);
+const bigPictureCommentsCountParagraph = bigPicture.querySelector(`.social__comment-count`);
+const bigPictureCommentsLoader = bigPicture.querySelector(`.comments-loader`);
+
+
+//    //    //    //    //    //    //    //    //    //    //
+//                                                          //
+//                 ПЕРВООЧЕРЕДНЫЕ ОПЕРАЦИИ                  //
+//                                                          //
+//    //    //    //    //    //    //    //    //    //    //
+
+const picturesPreviewContainer = document.querySelector(`.pictures`);
 
 const getRandomNumber = (max, min = 0, includeMax = false) => {
   const increment = includeMax ? 1 : 0;
@@ -85,10 +112,6 @@ const createPhotoArray = (arrayLength) => {
   return photoArray;
 };
 
-// // // // // // // // // // // // // // // // // // //
-//     Задаём функции для генерации DOM-элементов     //
-// // // // // // // // // // // // // // // // // // //
-
 const createDomPictureElement = (template, pictureObject) => {
   const newPictureElement = template.cloneNode(true);
   const imgElement = newPictureElement.querySelector(`.picture__img`);
@@ -111,29 +134,19 @@ const generateDomPicturesFragment = (picturesArray) => {
   return newFragment;
 };
 
-
-// // // // // // // // // // // // // // // // // //
-//    Проводим операции над разметкой страницы     //
-// // // // // // // // // // // // // // // // // //
-
-// //
-//   Готовимся тестировать полноэкранный режим
-// //
-
 // Генерируем объекты превью фотографий и заполняем их контентом
 const mockupPhotosArray = createPhotoArray(PHOTOS_AMOUNT);
 const mockupPhotosFragment = generateDomPicturesFragment(mockupPhotosArray);
 
-// Находим элементы полноэкранного режима
-const picturesParentElement = document.querySelector(`.pictures`);
-const bigPicture = document.querySelector(`.big-picture`);
-const bigPictureImg = bigPicture.querySelector(`.big-picture__img img `);
-const bigPictureLikesCount = bigPicture.querySelector(`.likes-count`);
-const bigPictureCommentsCount = bigPicture.querySelector(`.comments-count`);
-const bigPictureComments = bigPicture.querySelector(`.social__comments`);
-const bigPictureCaption = bigPicture.querySelector(`.social__caption`);
-const bigPictureCommentsCountParagraph = bigPicture.querySelector(`.social__comment-count`);
-const bigPictureCommentsLoader = bigPicture.querySelector(`.comments-loader`);
+// Добавляем  превью фотографий в разметку
+picturesPreviewContainer.appendChild(mockupPhotosFragment);
+
+
+//    //    //    //    //    //    //    //    //    //    //
+//                                                          //
+//           ОБРАБОТЧИКИ ПОЛНОЭКРАННОГО РЕЖИМА              //
+//                                                          //
+//    //    //    //    //    //    //    //    //    //    //
 
 // Находим шаблон комментария в разметке
 const commentTemplate = document.querySelector(`.social__comment`).cloneNode(true);
@@ -141,10 +154,7 @@ const commentTemplate = document.querySelector(`.social__comment`).cloneNode(tru
 // Берём для теста первую фотографию из массива мокап-фотографий
 const bigPictureTestObject = mockupPhotosArray[0];
 
-//
 // Задаём функцию наполнения окна полноэкранного режима
-//
-
 const showBigPicture = function (bigPictureObject) {
   // Готовим комментарии к размещению в разметке
   const bigPictureCommentsFragment = document.createDocumentFragment();
@@ -178,18 +188,159 @@ const showBigPicture = function (bigPictureObject) {
   // Прячем блоки счётчика комментариев и загрузки новых комментариев
   bigPictureCommentsCountParagraph.classList.add(`hidden`);
   bigPictureCommentsLoader.classList.add(`hidden`);
-  // Делаем полноэкранный режим видимым
-  bigPicture.classList.remove(`hidden`);
-  // Блокируем прокрутку страницы при открытом модальном окне;
-  document.body.classList.add(`modal-open`);
+  // Делаем полноэкранный режим видимым и блокируем прокрутку окна браузера
+  setTimeout(() => {
+    bigPicture.classList.remove(`hidden`);
+    document.body.classList.add(`modal-open`);
+  });
 };
 
-// //
-// Модифицируем содержание страницы
-// //
 
-// Добавляем  превью фотографий в разметку
-picturesParentElement.appendChild(mockupPhotosFragment);
+//    //    //    //    //    //    //    //    //    //    //
+//                                                          //
+//            ОБРАБОТЧИКИ ЗАГРУЗКИ ФОТОГРАФИЙ               //
+//                                                          //
+//    //    //    //    //    //    //    //    //    //    //
 
-// Тестово вызыаем показ картинки в полноэкранном режиме
-showBigPicture(bigPictureTestObject);
+const uploadPhotoForm = document.querySelector(`.img-upload__overlay`);
+const uploadPhotoInput = document.querySelector(`#upload-file`);
+const uploadPhotoCloseForm = uploadPhotoForm.querySelector(`#upload-cancel`);
+const uploadPhotoImagePreview = uploadPhotoForm.querySelector(`.img-upload__preview img`);
+const uploadPhotoEffectsFieldset = uploadPhotoForm.querySelector(`.img-upload__effects`);
+const uploadPhotoEffectLevelSlider = uploadPhotoForm.querySelector(`.img-upload__effect-level`);
+const uploadPhotoEffectLevelValue = uploadPhotoEffectLevelSlider.querySelector(`.effect-level__value`);
+const uploadPhotoEffectLevelPin = uploadPhotoEffectLevelSlider.querySelector(`.effect-level__pin`);
+const uploadPhotoEffectLevelDepth = uploadPhotoEffectLevelSlider.querySelector(`.effect-level__depth`);
+
+const scaleFieldSet = document.querySelector(`.img-upload__scale`);
+const scaleSmaller = scaleFieldSet.querySelector(`.scale__control--smaller`);
+const scaleBigger = scaleFieldSet.querySelector(`.scale__control--bigger`);
+const scaleValue = scaleFieldSet.querySelector(`.scale__control--value`);
+
+//     Обработчики изменения размера изображения
+const setScale = function (evt, explicitScale) {
+  if (explicitScale) {
+    scaleValue.value = explicitScale;
+  } else if (evt.target === scaleSmaller) {
+    scaleValue.value = `${Math.max(parseInt(scaleValue.value, 10) - 25, 25)}%`;
+  } else if (evt.target === scaleBigger) {
+    scaleValue.value = `${Math.min(parseInt(scaleValue.value, 10) + 25, 100)}%`;
+  };
+  uploadPhotoImagePreview.style.transform = `scale(${scaleValue.value})`;
+};
+
+//     Обработчики фильтров
+const setSliderVisibility = function (effect) {
+  if (effect === `none`) {
+    uploadPhotoEffectLevelSlider.classList.add(`hidden`);
+  } else if (uploadPhotoEffectLevelSlider.classList.contains(`hidden`)) {
+    uploadPhotoEffectLevelSlider.classList.remove(`hidden`);
+  }
+};
+
+const setEffect = function (newEffect, previousEffect) {
+  if (previousEffect) {
+    uploadPhotoImagePreview.classList.remove(`effects__preview--${previousEffect}`);
+  }
+  setSliderVisibility(newEffect);
+  uploadPhotoImagePreview.classList.add(`effects__preview--${newEffect}`);
+  uploadPhotoImagePreview.dataset.effect = newEffect;
+  uploadPhotoEffectLevelValue.value = MAX_EFFECT_VALUE;
+  setEffectCSSRule();
+
+  // ВРЕМЕННО
+  uploadPhotoEffectLevelPin.style.left = `100%`;
+  uploadPhotoEffectLevelDepth.style.width = `100%`;
+};
+
+const changeEffect = function (evt) {
+  const newEffect = evt.target.value;
+  const previousEffect = uploadPhotoImagePreview.dataset.effect;
+  setEffect(newEffect, previousEffect);
+};
+
+const effectsMap = {
+  chrome: {
+    min: 0, max: 1, name: `grayscale`, unit: ``,
+  },
+  sepia: {
+    min: 0, max: 1, name: `sepia`, unit: ``,
+  },
+  marvin: {
+    min: 0, max: 100, name: `invert`, unit: `%`,
+  },
+  phobos: {
+    min: 0, max: 3, name: `blur`, unit: `px`,
+  },
+  heat: {
+    min: 1, max: 3, name: `brightness`, unit: ``,
+  },
+};
+
+const setEffectValueByPinPos = function () {
+  uploadPhotoEffectLevelValue.value = parseInt(uploadPhotoEffectLevelPin.style.left, 10);
+};
+
+const getEffectValueString = function (effect, fraction) {
+  if (effect !== `none`) {
+    const effectObject = effectsMap[effect];
+    const effectName = effectObject.name;
+    const effectValue = (effectObject.max - effectObject.min) * fraction + effectObject.min;
+    const effectUnit = effectObject.unit;
+    return `${effectName}(${effectValue}${effectUnit})`;
+  } else {
+    return `none`;
+  }
+};
+
+const setEffectCSSRule = function () {
+  const effect = uploadPhotoImagePreview.dataset.effect;
+  const value = uploadPhotoEffectLevelValue.value / MAX_EFFECT_VALUE;
+  uploadPhotoImagePreview.style.filter = getEffectValueString(effect, value);
+};
+
+//
+//     Обработчики открытия и закрытия модального окна
+//
+const toggleUploadFormListeners = function (addListeners) {
+  const method = addListeners ? `addEventListener` : `removeEventListener`;
+  uploadPhotoEffectsFieldset[method](`change`, changeEffect);
+  uploadPhotoEffectLevelValue[method](`change`, setEffectCSSRule);
+  uploadPhotoEffectLevelPin[method](`mouseup`, setEffectValueByPinPos);
+  scaleSmaller[method](`click`, setScale);
+  scaleBigger[method](`click`, setScale);
+};
+
+const openUploadFileForm = function () {
+  setEffect(`none`);
+  setScale(null, `100%`);
+  uploadPhotoForm.classList.remove(`hidden`);
+  document.body.classList.add(`modal-open`);
+  document.addEventListener(`keydown`, closeUploadFormOnEsc);
+
+  toggleUploadFormListeners(true);
+};
+
+const closeUploadFileForm = function () {
+  uploadPhotoForm.classList.add(`hidden`);
+  document.body.classList.remove(`modal-open`);
+  document.removeEventListener(`keydown`, closeUploadFormOnEsc);
+  uploadPhotoInput.value = ``;
+
+  toggleUploadFormListeners(false);
+};
+
+const closeUploadFormOnEsc = function (evt) {
+  if (evt.key === `Escape`) {
+    closeUploadFileForm();
+  }
+};
+
+uploadPhotoInput.addEventListener(`change`, function () {
+  openUploadFileForm();
+});
+
+uploadPhotoCloseForm.addEventListener(`click`, function () {
+  closeUploadFileForm();
+});
+
