@@ -189,10 +189,8 @@ const showBigPicture = function (bigPictureObject) {
   bigPictureCommentsCountParagraph.classList.add(`hidden`);
   bigPictureCommentsLoader.classList.add(`hidden`);
   // Делаем полноэкранный режим видимым и блокируем прокрутку окна браузера
-  setTimeout(() => {
-    bigPicture.classList.remove(`hidden`);
-    document.body.classList.add(`modal-open`);
-  });
+  bigPicture.classList.remove(`hidden`);
+  document.body.classList.add(`modal-open`);
 };
 
 
@@ -201,6 +199,10 @@ const showBigPicture = function (bigPictureObject) {
 //            ОБРАБОТЧИКИ ЗАГРУЗКИ ФОТОГРАФИЙ               //
 //                                                          //
 //    //    //    //    //    //    //    //    //    //    //
+
+const SCALING_STEP = 25;
+const MAX_SCALE = 100;
+const MIN_SCALE = 25;
 
 const uploadPhotoForm = document.querySelector(`.img-upload__overlay`);
 const uploadPhotoInput = document.querySelector(`#upload-file`);
@@ -224,11 +226,11 @@ const setScale = function (evt, explicitScale) {
   if (explicitScale) {
     scaleValue.value = explicitScale;
   } else if (evt.target === scaleSmaller) {
-    scaleValue.value = `${Math.max(parseInt(scaleValue.value, 10) - 25, 25)}%`;
+    scaleValue.value = `${Math.max(parseInt(scaleValue.value, 10) - SCALING_STEP, MIN_SCALE)}%`;
   } else if (evt.target === scaleBigger) {
-    scaleValue.value = `${Math.min(parseInt(scaleValue.value, 10) + 25, 100)}%`;
+    scaleValue.value = `${Math.min(parseInt(scaleValue.value, 10) + SCALING_STEP, MAX_SCALE)}%`;
   }
-  uploadPhotoImagePreview.style.transform = `scale(${scaleValue.value})`;
+  uploadPhotoImagePreview.style.transform = `scale(${parseInt(scaleValue.value, 10) / 100})`;
 };
 
 //     Обработчики фильтров
