@@ -32,6 +32,7 @@
   const uploadPhotoInput = document.querySelector(`#upload-file`);
 
   const uploadForm = document.querySelector(`.img-upload__form`);
+  // const uploadFormSubmit = document.querySelector(`.img-upload__submit`);
   const overlay = document.querySelector(`.img-upload__overlay`);
   const overlayCloseButton = overlay.querySelector(`#upload-cancel`);
   const overlayImagePreview = overlay.querySelector(`.img-upload__preview img`);
@@ -156,15 +157,21 @@
 
   /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /    */
 
+  // Установка стилей валидации
+  const setValidationStyles = function (isValid) {
+    if (isValid) {
+      hashtagsInput.style.borderColor = ``;
+    } else {
+      hashtagsInput.style.borderColor = `#cd3300`;
+    }
+  };
+
   // Валидация одного хэштега
   const checkSingleHashtagValidity = function (hashtag) {
     const thisTagValiditySet = new Set();
     if (hashtag === ``) {
       return [];
     }
-    // if (hashtag === `#`) {
-    //   return [`хэштег должен содержать хотя бы одну букву или цифру`];
-    // }
     if (!hashtag.startsWith(`#`)) {
       thisTagValiditySet.add(`хэштег должен начинаться с символа "#"`);
     }
@@ -205,9 +212,10 @@
     let validityStr = (Array.from(validitiesSet)).join(`, `);
     hashtagsInput.setCustomValidity(validityStr.slice(0, 1).toUpperCase() + validityStr.slice(1));
     hashtagsInput.reportValidity();
+    setValidationStyles(validityStr === ``);
   };
 
-  const checkFormValidityOnSubmit = function (evt) {
+  const checkFormValidity = function (evt) {
     // Поскольку событие submit может состояться только если основная валидация при вводе прошла,
     // мы может осуществить дополнительные проверки, которые во благо UX не стоило осуществлять при вводе
     const hashtagsArray = hashtagsInput.value.toLowerCase().split(` `).filter((el) => el !== ` `);
@@ -215,7 +223,11 @@
       evt.preventDefault();
       hashtagsInput.setCustomValidity(`Хэштег должен содержать хотя бы одну букву или цифру`);
       hashtagsInput.reportValidity();
+      setValidationStyles(false);
+      return false;
     }
+    setValidationStyles(true);
+    return true;
   };
 
   // Валидация комментария
@@ -244,10 +256,10 @@
     overlayEffectsValue[method](`change`, applyEffect);
     overlayEffectsPin[method](`mousedown`, movePin);
     hashtagsInput[method](`input`, checkHashtagsValidity);
-    uploadForm[method](`submit`, checkFormValidityOnSubmit);
+    hashtagsInput[method](`blur`, checkFormValidity);
+    uploadForm[method](`submit`, submitForm);
     commentInput[method](`input`, checkCommentValidity);
     overlayCloseButton[method](`click`, closeUploadFileForm);
-
     document[method](`keydown`, closeUploadFormOnEsc);
   };
 
@@ -265,6 +277,35 @@
     uploadPhotoInput.value = ``;
 
     toggleUploadFormListeners(false);
+  };
+
+  /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /    */
+
+  const showNotificationAndCloseForm = function (isSuccessful) {
+    const notificationFragment = (
+      isSuccessful ? window.successTemplate : window.errorTemplate
+    ).content.cloneNode(true);
+    closeUploadFileForm();
+    window.pageMain.appendChild(notificationFragment);
+    window.toggleNotificationListeners(`on`);
+  };
+
+  const submitForm = function (evt) {
+    evt.preventDefault();
+
+    const formData = new FormData(uploadForm);
+    let xhr = new XMLHttpRequest();
+    xhr.addEventListener(`load`, function () {
+      showNotificationAndCloseForm(xhr.status < 400);
+    });
+    xhr.addEventListener(`error`, function () {
+      showNotificationAndCloseForm(false);
+    });
+    xhr.addEventListener(`timeout`, function () {
+      showNotificationAndCloseForm(false);
+    });
+    xhr.open(`POST`, `https://21.javascript.pages.academy/kekstagram`);
+    xhr.send(formData);
   };
 
   /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /    */
