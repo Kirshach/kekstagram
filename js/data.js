@@ -150,6 +150,8 @@
     if (xhr.status < 400) {
       picturesData = JSON.parse(xhr.response);
       populatePreviews(picturesData);
+      window.filters.filtersNode.classList.remove(`img-filters--inactive`);
+      window.filters.addListener();
     } else {
       showError(`Что-то пошло не так 😱`);
     }

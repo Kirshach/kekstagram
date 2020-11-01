@@ -4,6 +4,9 @@
   window.pageMain = document.querySelector(`main`);
   window.successTemplate = document.querySelector(`#success`);
   window.errorTemplate = document.querySelector(`#error`);
+  window.filters = {
+    filtersNode: document.querySelector(`.img-filters`),
+  };
 
   const closeNotificationOnEsc = function (evt) {
     if (evt.key === `Escape`) {
