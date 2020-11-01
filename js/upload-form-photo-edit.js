@@ -31,13 +31,13 @@
 
   const {
     overlayNode,
-    effectsSlider, effectsLine, effectsPin, effectsValue,
-    scaleFieldSet, scaleSmaller, scaleBigger
+    effectsSliderNode, effectsLineNode, effectsPinNode, effectsValueNode,
+    scaleFieldSetNode, scaleSmallerNode, scaleBiggerNode
   } = uploadForm;
 
   const imagePreview = overlayNode.querySelector(`.img-upload__preview img`);
   const effectsFill = overlayNode.querySelector(`.effect-level__depth`);
-  const scaleInputValue = scaleFieldSet.querySelector(`.scale__control--value`);
+  const scaleInputValue = scaleFieldSetNode.querySelector(`.scale__control--value`);
 
   const resetScale = function () {
     setScale(null, DEFAULT_SCALE_VALUE);
@@ -48,9 +48,9 @@
   };
 
   const resetSlider = function () {
-    effectsPin.style.left = `${DEFAULT_EFFECT_VALUE}%`;
+    effectsPinNode.style.left = `${DEFAULT_EFFECT_VALUE}%`;
     effectsFill.style.width = `${DEFAULT_EFFECT_VALUE}%`;
-    effectsValue.value = DEFAULT_EFFECT_VALUE;
+    effectsValueNode.value = DEFAULT_EFFECT_VALUE;
   };
 
   const resetForm = function () {
@@ -64,9 +64,9 @@
     let scaleValue;
     if (explicitValue) {
       scaleValue = `${explicitValue}%`;
-    } else if (evt.target === scaleSmaller) {
+    } else if (evt.target === scaleSmallerNode) {
       scaleValue = `${Math.max(parseInt(scaleInputValue.value, 10) - SCALING_STEP, MIN_SCALE)}%`;
-    } else if (evt.target === scaleBigger) {
+    } else if (evt.target === scaleBiggerNode) {
       scaleValue = `${Math.min(parseInt(scaleInputValue.value, 10) + SCALING_STEP, MAX_SCALE)}%`;
     }
     scaleInputValue.value = scaleValue;
@@ -90,9 +90,9 @@
 
   const setSliderVisibility = function (effect) {
     if (effect === `none`) {
-      effectsSlider.classList.add(`hidden`);
-    } else if (effectsSlider.classList.contains(`hidden`)) {
-      effectsSlider.classList.remove(`hidden`);
+      effectsSliderNode.classList.add(`hidden`);
+    } else if (effectsSliderNode.classList.contains(`hidden`)) {
+      effectsSliderNode.classList.remove(`hidden`);
     }
   };
 
@@ -108,26 +108,26 @@
   };
 
   const setEffectValue = function (value) {
-    effectsValue.value = value;
+    effectsValueNode.value = value;
   };
 
   const applyEffect = function () {
     const effect = imagePreview.dataset.effect;
-    const value = effectsValue.value;
+    const value = effectsValueNode.value;
     imagePreview.style.filter = getEffectValueString(effect, value);
   };
 
   const movePin = function (mouseDownEvt) {
     mouseDownEvt.preventDefault();
-    const startPinOffsetX = effectsPin.offsetLeft;
-    const maxOffsetX = effectsLine.offsetWidth;
+    const startPinOffsetX = effectsPinNode.offsetLeft;
+    const maxOffsetX = effectsLineNode.offsetWidth;
     const startClientX = mouseDownEvt.clientX;
 
     const onMouseMove = function (mouseMoveEvt) {
       mouseDownEvt.stopPropagation();
       const shiftX = mouseMoveEvt.clientX - startClientX;
       const newPinOffsetX = Math.min(Math.max(0, startPinOffsetX + shiftX), maxOffsetX);
-      effectsPin.style.left = `${newPinOffsetX}px`;
+      effectsPinNode.style.left = `${newPinOffsetX}px`;
       effectsFill.style.width = `${newPinOffsetX}px`;
       setEffectValue(Math.round((newPinOffsetX / maxOffsetX) * 100));
       applyEffect();

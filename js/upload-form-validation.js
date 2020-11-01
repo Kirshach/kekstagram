@@ -3,7 +3,7 @@
 (function () {
   const MAX_COMMENT_LENGTH = 140;
 
-  const {overlayNode, commentInput} = window.uploadForm;
+  const {overlayNode, commentInputNode} = window.uploadForm;
   const hashtagsInput = overlayNode.querySelector(`.text__hashtags`);
 
   // Установка стилей валидации
@@ -80,11 +80,11 @@
 
   // Валидация комментария
   const checkCommentValidity = function () {
-    if (commentInput.value.length >= MAX_COMMENT_LENGTH) {
-      commentInput.setCustomValidity(`Длина комментария не должна превышать ${MAX_COMMENT_LENGTH} символов`);
-      commentInput.reportValidity();
+    if (commentInputNode.value.length >= MAX_COMMENT_LENGTH) {
+      commentInputNode.setCustomValidity(`Длина комментария не должна превышать ${MAX_COMMENT_LENGTH} символов`);
+      commentInputNode.reportValidity();
     } else {
-      commentInput.setCustomValidity(``);
+      commentInputNode.setCustomValidity(``);
     }
   };
 

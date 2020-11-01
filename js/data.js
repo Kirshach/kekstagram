@@ -5,7 +5,6 @@
   const AVATAR_SIZE = 35;
   const TIMEOUT = 7000;
 
-
   /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /    */
 
   const bigPicture = document.querySelector(`.big-picture`);
@@ -18,37 +17,12 @@
   const bigPictureCommentsLoader = bigPicture.querySelector(`.comments-loader`);
   const bigPictureCloseButton = bigPicture.querySelector(`.big-picture__cancel`);
 
-  const picturesContainer = document.querySelector(`.pictures`);
+  const {picturesContainerNode, generateDomPicturesFragment} = window;
+
 
   /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /   */
 
-  let picturesData = [];
   let currentBigPicIndex;
-
-  // Генерирует DOM-элемент превью поста
-  const createDomPictureElement = (template, pictureObject, index) => {
-    const newPictureElement = template.cloneNode(true);
-    const imgElement = newPictureElement.querySelector(`.picture__img`);
-    const likesAmountElement = newPictureElement.querySelector(`.picture__likes`);
-    const commentsAmountElement = newPictureElement.querySelector(`.picture__comments`);
-
-    newPictureElement.dataset.index = index;
-    imgElement.src = pictureObject.url;
-    likesAmountElement.textContent = pictureObject.likes;
-    commentsAmountElement.textContent = pictureObject.comments.length;
-    return newPictureElement;
-  };
-
-  // Генерирует HTML-фрагмент превью постов из объектов picturesArray
-  const generateDomPicturesFragment = (picturesArray) => {
-    const newFragment = document.createDocumentFragment();
-    const pictureTemplate = document.querySelector(`#picture`).content.querySelector(`.picture`);
-    for (let i = 0; i < picturesArray.length; i++) {
-      const newChildElement = createDomPictureElement(pictureTemplate, picturesArray[i], i);
-      newFragment.appendChild(newChildElement);
-    }
-    return newFragment;
-  };
 
   /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /   */
 
@@ -73,7 +47,7 @@
   };
 
   const getNewComments = function () {
-    const commentsArray = picturesData[currentBigPicIndex].comments;
+    const commentsArray = window.picturesData[currentBigPicIndex].comments;
     const newCommentsFragment = document.createDocumentFragment();
     let newCommentIndex = bigPictureComments.children.length;
     const lastCommentIndex = Math.min(newCommentIndex + NEW_COMMENTS_BATCH, commentsArray.length);
@@ -93,7 +67,6 @@
       newCommentsFragment.appendChild(commentsItem);
     }
 
-    // console.log(`actual length: `, bigPictureComments.children.length, `max length: `, commentsArray.length);
     bigPictureComments.appendChild(newCommentsFragment);
     if (bigPictureComments.children.length >= commentsArray.length) {
       bigPictureCommentsLoader.classList.add(`hidden`);
@@ -111,7 +84,7 @@
     currentBigPicIndex = target.dataset.index;
 
     bigPictureComments.innerHTML = ``;
-    const bigPictureObject = picturesData[currentBigPicIndex];
+    const bigPictureObject = window.filteredPicturesData[currentBigPicIndex];
     getNewComments();
 
     bigPictureImg.src = bigPictureObject.url;
@@ -130,15 +103,15 @@
 
   const populatePreviews = function (data) {
     const previewsFragment = generateDomPicturesFragment(data);
-    picturesContainer.appendChild(previewsFragment);
-    picturesContainer.addEventListener(`click`, showBigPicture);
+    picturesContainerNode.appendChild(previewsFragment);
+    picturesContainerNode.addEventListener(`click`, showBigPicture);
   };
 
   const showError = function (message) {
     const errorFragment = window.errorTemplate.content.cloneNode(true);
     errorFragment.querySelector(`.error__title`).textContent = message;
     errorFragment.querySelector(`.error__button`).textContent = `Понятно ;(`;
-    window.pageMain.appendChild(errorFragment);
+    window.pageMainNode.appendChild(errorFragment);
     window.toggleNotificationListeners(`on`);
   };
 
@@ -148,8 +121,8 @@
 
   xhr.addEventListener(`load`, function () {
     if (xhr.status < 400) {
-      picturesData = JSON.parse(xhr.response);
-      populatePreviews(picturesData);
+      window.picturesData = JSON.parse(xhr.response);
+      populatePreviews(window.picturesData);
       window.filters.filtersNode.classList.remove(`img-filters--inactive`);
       window.filters.addListener();
     } else {

@@ -4,9 +4,9 @@
 
   const {
     overlayNode,
-    effectsValue,
-    scaleSmaller, scaleBigger,
-    commentInput,
+    effectsValueNode,
+    scaleSmallerNode, scaleBiggerNode,
+    commentInputNode,
   } = window.uploadForm;
 
   const {
@@ -28,7 +28,7 @@
 
   const hashtagsInput = document.querySelector(`.text__hashtags`);
 
-  const blockingInputs = [hashtagsInput, commentInput];
+  const blockingInputs = [hashtagsInput, commentInputNode];
 
 
   const closeUploadFormOnEsc = function (evt) {
@@ -40,15 +40,15 @@
   // Функция добавления/снятия обработчиков событий
   const toggleUploadFormListeners = function (addListeners) {
     const method = addListeners ? `addEventListener` : `removeEventListener`;
-    scaleSmaller[method](`click`, setScale);
-    scaleBigger[method](`click`, setScale);
+    scaleSmallerNode[method](`click`, setScale);
+    scaleBiggerNode[method](`click`, setScale);
     overlayEffectsFieldset[method](`change`, setEffectType);
-    effectsValue[method](`change`, applyEffect);
-    window.uploadForm.effectsPin[method](`mousedown`, movePin);
+    effectsValueNode[method](`change`, applyEffect);
+    window.uploadForm.effectsPinNode[method](`mousedown`, movePin);
     hashtagsInput[method](`input`, checkHashtagsValidity);
     hashtagsInput[method](`blur`, checkFormValidity);
     uploadForm[method](`submit`, submitForm);
-    commentInput[method](`input`, checkCommentValidity);
+    commentInputNode[method](`input`, checkCommentValidity);
     overlayCloseButton[method](`click`, closeUploadFileForm);
     document[method](`keydown`, closeUploadFormOnEsc);
   };
@@ -76,7 +76,7 @@
       isSuccessful ? window.successTemplate : window.errorTemplate
     ).content.cloneNode(true);
     closeUploadFileForm();
-    window.pageMain.appendChild(notificationFragment);
+    window.pageMainNode.appendChild(notificationFragment);
     window.toggleNotificationListeners(`on`);
   };
 

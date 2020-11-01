@@ -3,23 +3,23 @@
 (function () {
 
   const overlayNode = document.querySelector(`.img-upload__overlay`);
-  const scaleFieldSet = overlayNode.querySelector(`.img-upload__scale`);
-  const effectsSlider = overlayNode.querySelector(`.img-upload__effect-level`);
-  const effectsLine = effectsSlider.querySelector(`.effect-level__line`);
+  const scaleFieldSetNode = overlayNode.querySelector(`.img-upload__scale`);
+  const effectsSliderNode = overlayNode.querySelector(`.img-upload__effect-level`);
+  const effectsLineNode = effectsSliderNode.querySelector(`.effect-level__line`);
 
   window.uploadForm = {
     overlayNode,
 
-    effectsSlider,
-    effectsLine,
-    effectsPin: effectsLine.querySelector(`.effect-level__pin`),
-    effectsValue: effectsSlider.querySelector(`.effect-level__value`),
+    effectsSliderNode,
+    effectsLineNode,
+    effectsPinNode: effectsLineNode.querySelector(`.effect-level__pin`),
+    effectsValueNode: effectsSliderNode.querySelector(`.effect-level__value`),
 
-    scaleFieldSet,
-    scaleSmaller: scaleFieldSet.querySelector(`.scale__control--smaller`),
-    scaleBigger: scaleFieldSet.querySelector(`.scale__control--bigger`),
+    scaleFieldSetNode,
+    scaleSmallerNode: scaleFieldSetNode.querySelector(`.scale__control--smaller`),
+    scaleBiggerNode: scaleFieldSetNode.querySelector(`.scale__control--bigger`),
 
-    commentInput: overlayNode.querySelector(`.text__description`),
+    commentInputNode: overlayNode.querySelector(`.text__description`),
   };
 })();
 
