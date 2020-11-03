@@ -24,8 +24,6 @@
 
   let currentBigPicIndex;
 
-  /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /   */
-
   const commentTemplate = document.querySelector(`.social__comment`).cloneNode(true);
 
   const closeBigPicture = function () {

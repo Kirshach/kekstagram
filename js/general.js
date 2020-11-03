@@ -34,7 +34,7 @@
     }
   };
 
-  /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+  /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /   */
 
   window.pageMainNode = document.querySelector(`main`);
   window.successTemplate = document.querySelector(`#success`);

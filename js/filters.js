@@ -2,6 +2,8 @@
 
 (function () {
   const RANDOM_FILTERED_IMAGES_AMOUNT = 10;
+  const FILTERS_THROTTLE_TIME = 500;
+
   window.filteredPicturesData = [];
 
   const {picturesContainerNode, generateDomPicturesFragment} = window;
@@ -40,10 +42,16 @@
     },
   };
 
+  let lastFilterCall;
+
   window.filters.addListener = function () {
     const filtersForm = this.filtersNode.querySelector(`.img-filters__form`);
 
     filtersForm.addEventListener(`click`, (evt) => {
+      if (lastFilterCall && (Date.now() - lastFilterCall < FILTERS_THROTTLE_TIME)) {
+        return;
+      }
+      lastFilterCall = Date.now();
       const previousFilterButton = filtersForm.querySelector(`.img-filters__button--active`);
       const {target} = evt;
 
