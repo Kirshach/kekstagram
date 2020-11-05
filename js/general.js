@@ -17,17 +17,21 @@
   const closeNotificationOnEsc = function (evt) {
     if (evt.key === `Escape`) {
       evt.preventDefault();
-      const notificationNode = window.pageMainNode.querySelector(`.success`) || window.pageMainNode.querySelector(`.error`);
+      const notificationNode =
+        window.pageMainNode.querySelector(`.success`) ||
+        window.pageMainNode.querySelector(`.error`);
       notificationNode.remove();
       window.toggleNotificationListeners(`off`);
     }
   };
 
   const closeNotificationOnClick = function (evt) {
-    const notificationNode = window.pageMainNode.querySelector(`.success`) || window.pageMainNode.querySelector(`.error`);
+    const notificationNode =
+      window.pageMainNode.querySelector(`.success`) ||
+      window.pageMainNode.querySelector(`.error`);
     if (
-      evt.target === notificationNode
-      || evt.target === notificationNode.querySelector(`button`)
+      evt.target === notificationNode ||
+      evt.target === notificationNode.querySelector(`button`)
     ) {
       notificationNode.remove();
       window.toggleNotificationListeners(`off`);
@@ -40,10 +44,8 @@
   window.successTemplate = document.querySelector(`#success`);
   window.errorTemplate = document.querySelector(`#error`);
   window.picturesContainerNode = document.querySelector(`.pictures`);
-  window.pictureTemplate = document.querySelector(`#picture`).content.querySelector(`.picture`)
-  window.filters = {
-    filtersNode: document.querySelector(`.img-filters`),
-  };
+  window.pictureTemplate = document.querySelector(`#picture`).content.querySelector(`.picture`);
+  window.filters = {filtersNode: document.querySelector(`.img-filters`)};
 
   window.generateDomPicturesFragment = (picturesArray) => {
     const newFragment = document.createDocumentFragment();
