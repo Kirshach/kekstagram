@@ -10,10 +10,10 @@
   const bigPicture = document.querySelector(`.big-picture`);
   const bigPictureImg = bigPicture.querySelector(`.big-picture__img img `);
   const bigPictureLikesCount = bigPicture.querySelector(`.likes-count`);
-  const bigPictureCommentsCount = bigPicture.querySelector(`.comments-count`);
   const bigPictureComments = bigPicture.querySelector(`.social__comments`);
   const bigPictureCaption = bigPicture.querySelector(`.social__caption`);
   const bigPictureCommentsCountParagraph = bigPicture.querySelector(`.social__comment-count`);
+  const bigPictureCommentsCountSpan = bigPictureCommentsCountParagraph.querySelector(`.comments-count`);
   const bigPictureCommentsLoader = bigPicture.querySelector(`.comments-loader`);
   const bigPictureCloseButton = bigPicture.querySelector(`.big-picture__cancel`);
 
@@ -28,6 +28,7 @@
 
   const closeBigPicture = function () {
     bigPicture.classList.add(`hidden`);
+    document.body.classList.remove(`modal-open`);
     toggleBigPictureListeners(`off`);
   };
 
@@ -71,6 +72,9 @@
     } else {
       bigPictureCommentsLoader.classList.remove(`hidden`);
     }
+
+    const commentsParagraphFirstTextNode = bigPictureCommentsCountParagraph.childNodes[0];
+    commentsParagraphFirstTextNode.data = `${bigPictureComments.children.length} из `;
   };
 
   const showBigPicture = function (evt) {
@@ -87,10 +91,10 @@
 
     bigPictureImg.src = bigPictureObject.url;
     bigPictureLikesCount.textContent = bigPictureObject.likes;
-    bigPictureCommentsCount.textContent = bigPictureObject.comments.length;
     bigPictureCaption.textContent = bigPictureObject.description;
 
-    bigPictureCommentsCountParagraph.classList.add(`hidden`);
+    bigPictureCommentsCountSpan.textContent = bigPictureObject.comments.length;
+
     bigPicture.classList.remove(`hidden`);
     document.body.classList.add(`modal-open`);
 
@@ -119,7 +123,7 @@
 
   xhr.addEventListener(`load`, function () {
     if (xhr.status < 400) {
-      window.picturesData = JSON.parse(xhr.response);
+      window.filteredPicturesData = window.picturesData = JSON.parse(xhr.response);
       populatePreviews(window.picturesData);
       window.filters.filtersNode.classList.remove(`img-filters--inactive`);
       window.filters.addListener();
