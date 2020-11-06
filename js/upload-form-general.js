@@ -1,7 +1,6 @@
 "use strict";
 
 (function () {
-
   const overlayNode = document.querySelector(`.img-upload__overlay`);
   const scaleFieldSetNode = overlayNode.querySelector(`.img-upload__scale`);
   const effectsSliderNode = overlayNode.querySelector(`.img-upload__effect-level`);
@@ -22,4 +21,3 @@
     commentInputNode: overlayNode.querySelector(`.text__description`),
   };
 })();
-
