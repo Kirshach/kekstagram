@@ -1,7 +1,7 @@
 "use strict";
 
 (function () {
-  const NEW_COMMENTS_BATCH = 5;
+  const COMMENTS_BATCH_SIZE = 5;
   const AVATAR_SIZE = 35;
   const TIMEOUT = 7000;
 
@@ -14,7 +14,7 @@
   const bigPictureCaption = bigPicture.querySelector(`.social__caption`);
   const bigPictureCommentsCountParagraph = bigPicture.querySelector(`.social__comment-count`);
   const bigPictureCommentsCountSpan = bigPictureCommentsCountParagraph.querySelector(`.comments-count`);
-  const bigPictureCommentsLoader = bigPicture.querySelector(`.comments-loader`);
+  const bigPictureLoadComentsButton = bigPicture.querySelector(`.comments-loader`);
   const bigPictureCloseButton = bigPicture.querySelector(`.big-picture__cancel`);
 
   const {picturesContainerNode, generateDomPicturesFragment} = window;
@@ -41,18 +41,15 @@
   const toggleBigPictureListeners = function (direction) {
     const method = direction === `on` ? `addEventListener` : `removeEventListener`;
     bigPictureCloseButton[method](`click`, closeBigPicture);
-    bigPictureCommentsLoader[method](`click`, getNewComments);
+    bigPictureLoadComentsButton[method](`click`, getAndRenderNewComments);
     document[method](`keydown`, closeBigPictureOnEsc);
   };
 
-  const getNewComments = function () {
-    const commentsArray = window.picturesData[currentBigPicIndex].comments;
+  const renderCommentsBatch = function (commentsArray) {
     const newCommentsFragment = document.createDocumentFragment();
-    let newCommentIndex = bigPictureComments.children.length;
-    const lastCommentIndex = Math.min(newCommentIndex + NEW_COMMENTS_BATCH, commentsArray.length);
 
-    for (; newCommentIndex < lastCommentIndex; newCommentIndex += 1) {
-      const currentComment = commentsArray[newCommentIndex];
+    for (let i = 0; i < commentsArray.length; i += 1) {
+      const currentComment = commentsArray[i];
       const commentsItem = commentTemplate.cloneNode(true);
       const commentsAvatar = commentsItem.querySelector(`.social__picture`);
       const commentsParagraph = commentsItem.querySelector(`.social__text`);
@@ -65,20 +62,34 @@
 
       newCommentsFragment.appendChild(commentsItem);
     }
-
     bigPictureComments.appendChild(newCommentsFragment);
-    if (bigPictureComments.children.length >= commentsArray.length) {
-      bigPictureCommentsLoader.classList.add(`hidden`);
+    const overallCommentsAmount = window.filteredPicturesData[currentBigPicIndex].comments.length;
+    if (bigPictureComments.children.length >= overallCommentsAmount) {
+      bigPictureLoadComentsButton.classList.add(`hidden`);
     } else {
-      bigPictureCommentsLoader.classList.remove(`hidden`);
+      bigPictureLoadComentsButton.classList.remove(`hidden`);
     }
 
     const commentsParagraphFirstTextNode = bigPictureCommentsCountParagraph.childNodes[0];
     commentsParagraphFirstTextNode.data = `${bigPictureComments.children.length} из `;
   };
 
+  const getAndRenderNewComments = function () {
+    const commentsArray = window.filteredPicturesData[currentBigPicIndex].comments;
+    let newCommentIndex = bigPictureComments.children.length;
+    const lastCommentIndex = Math.min(newCommentIndex + COMMENTS_BATCH_SIZE, commentsArray.length);
+
+    const newComments = [];
+    for (; newCommentIndex < lastCommentIndex; newCommentIndex += 1) {
+      newComments.push(commentsArray[newCommentIndex]);
+    }
+    renderCommentsBatch(newComments);
+
+  };
+
   const showBigPicture = function (evt) {
     const target = evt.composedPath()[1];
+
     if (!target.classList.contains(`picture`)) {
       return;
     }
@@ -87,7 +98,8 @@
 
     bigPictureComments.innerHTML = ``;
     const bigPictureObject = window.filteredPicturesData[currentBigPicIndex];
-    getNewComments();
+    const initialCommentsArray = bigPictureObject.comments.slice(0, COMMENTS_BATCH_SIZE);
+    renderCommentsBatch(initialCommentsArray);
 
     bigPictureImg.src = bigPictureObject.url;
     bigPictureLikesCount.textContent = bigPictureObject.likes;
