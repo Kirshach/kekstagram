@@ -66,7 +66,7 @@ window.sendXMLHttpRequest = (URL, method, onLoad, onError, onTimeout, timeoutInM
   xhr.open(method, URL);
   xhr.timeout = timeoutInMs;
 
-  const onLoadBoundToXHR = onLoad.bind(null, xhr);
+  const onLoadBoundToXHR = () => onLoad(xhr);
 
   xhr.addEventListener(`load`, onLoadBoundToXHR);
   xhr.addEventListener(`error`, onError);

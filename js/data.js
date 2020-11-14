@@ -167,9 +167,9 @@ const onDataLoadSuccess = (xhr) => {
   }
 };
 
-const onDataLoadError = showError.bind(null, DATA_LOAD_ERROR_MESSAGE);
+const onDataLoadError = () => showError(DATA_LOAD_ERROR_MESSAGE);
 
-const onDataLoadTimeout = showError.bind(null, DATA_LOAD_TIMEOUT_MESSAGE);
+const onDataLoadTimeout = () => showError(DATA_LOAD_TIMEOUT_MESSAGE);
 
 /*   /    /    /    /    /    /    /    /    /    /    /    /    /    /    */
 
