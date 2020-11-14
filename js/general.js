@@ -13,7 +13,7 @@ const createDomPictureElement = (template, pictureObject, index) => {
   return newPictureElement;
 };
 
-const closeNotificationOnEsc = function (evt) {
+const onDocumentKeyDown = (evt) => {
   if (evt.key === `Escape`) {
     evt.preventDefault();
     const notificationNode =
@@ -24,7 +24,7 @@ const closeNotificationOnEsc = function (evt) {
   }
 };
 
-const closeNotificationOnClick = function (evt) {
+const onDocumentClick = (evt) => {
   const notificationNode =
       window.pageMainNode.querySelector(`.success`) ||
       window.pageMainNode.querySelector(`.error`);
@@ -55,10 +55,35 @@ window.generateDomPicturesFragment = (picturesArray) => {
   return newFragment;
 };
 
-window.toggleNotificationListeners = function (direction) {
+window.toggleNotificationListeners = (direction) => {
   const method = direction === `on` ? `addEventListener` : `removeEventListener`;
-  document[method](`keydown`, closeNotificationOnEsc);
-  document[method](`click`, closeNotificationOnClick);
+  document[method](`keydown`, onDocumentKeyDown);
+  document[method](`click`, onDocumentClick);
 };
 
+window.sendXMLHttpRequest = (URL, method, onLoad, onError, onTimeout, timeoutInMs, postRequestBody) => {
+  const xhr = new XMLHttpRequest();
+  xhr.open(method, URL);
+  xhr.timeout = timeoutInMs;
 
+  const onLoadBoundToXHR = onLoad.bind(null, xhr);
+
+  xhr.addEventListener(`load`, onLoadBoundToXHR);
+  xhr.addEventListener(`error`, onError);
+  xhr.addEventListener(`timeout`, onTimeout);
+
+  xhr.send(postRequestBody);
+};
+
+window.debounceFunction = (functionToDebounce, debounceTime) => {
+  let lastFunctionTimeoutId;
+
+  return (...args) => {
+    if (lastFunctionTimeoutId) {
+      clearTimeout(lastFunctionTimeoutId);
+    }
+    lastFunctionTimeoutId = setTimeout(() => {
+      functionToDebounce(...args);
+    }, debounceTime);
+  };
+};

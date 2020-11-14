@@ -7,12 +7,12 @@ window.filteredPicturesData = [];
 
 const {picturesContainerNode, generateDomPicturesFragment} = window;
 
-const spliceRandomElement = function (array) {
+const spliceRandomElement = (array) => {
   const randomIndex = Math.floor(Math.random() * array.length);
   return array.splice(randomIndex, 1);
 };
 
-const deleteAllImagesNodes = function () {
+const deleteAllImagesNodes = () => {
   const imgUploadNode = picturesContainerNode.querySelector(`.img-upload`);
   while (imgUploadNode.nextSibling) {
     imgUploadNode.nextSibling.remove();
@@ -20,11 +20,11 @@ const deleteAllImagesNodes = function () {
 };
 
 const filterIdToFilterFunction = {
-  "filter-default": function () {
+  "filter-default": () => {
     window.filteredPicturesData = window.picturesData;
     return generateDomPicturesFragment(window.picturesData);
   },
-  "filter-random": function () {
+  "filter-random": () => {
     const newImagesArray = [];
     const picturesDataCopy = [...window.picturesData];
     for (let i = 0; i < RANDOM_FILTERED_IMAGES_AMOUNT; i++) {
@@ -34,14 +34,14 @@ const filterIdToFilterFunction = {
     window.filteredPicturesData = newImagesArray;
     return generateDomPicturesFragment(newImagesArray);
   },
-  "filter-discussed": function () {
+  "filter-discussed": () => {
     const sortedByDiscussionsPictures = [...window.picturesData].sort((pic1, pic2) => pic2.comments.length - pic1.comments.length);
     window.filteredPicturesData = sortedByDiscussionsPictures;
     return generateDomPicturesFragment(sortedByDiscussionsPictures);
   },
 };
 
-const switchFilter = function (evt) {
+const switchFilter = (evt) => {
   const {target} = evt;
   const filtersForm = target.parentNode;
   const previousFilterButton = filtersForm.querySelector(`.img-filters__button--active`);
@@ -56,17 +56,10 @@ const switchFilter = function (evt) {
   target.classList.add(`img-filters__button--active`);
 };
 
-let lastFilterTimeout;
+
+const onFiltersFormClick = window.debounceFunction(switchFilter, FILTERS_DEBOUNCE_TIME);
 
 window.filters.addListener = function () {
   const filtersForm = this.filtersNode.querySelector(`.img-filters__form`);
-
-  filtersForm.addEventListener(`click`, (evt) => {
-    if (lastFilterTimeout) {
-      clearTimeout(lastFilterTimeout);
-    }
-    lastFilterTimeout = setTimeout(function () {
-      switchFilter(evt);
-    }, FILTERS_DEBOUNCE_TIME);
-  });
+  filtersForm.addEventListener(`click`, onFiltersFormClick);
 };

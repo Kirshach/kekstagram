@@ -37,28 +37,28 @@ const {imagePreview} = window.uploadForm;
 const effectsFill = overlayNode.querySelector(`.effect-level__depth`);
 const scaleInputValue = scaleFieldSetNode.querySelector(`.scale__control--value`);
 
-const resetScale = function () {
+const resetScale = () => {
   setScale(null, DEFAULT_SCALE_VALUE);
 };
 
-const resetEffects = function () {
+const resetEffects = () => {
   setEffectType(null, `none`);
 };
 
-const resetSlider = function () {
+const resetSlider = () => {
   effectsPinNode.style.left = `${DEFAULT_EFFECT_VALUE}%`;
   effectsFill.style.width = `${DEFAULT_EFFECT_VALUE}%`;
   effectsValueNode.value = DEFAULT_EFFECT_VALUE;
 };
 
-const resetForm = function () {
+const clearFormData = () => {
   resetScale();
   resetEffects();
   resetSlider();
 };
 
 //  Обработчик изменения размера изображения
-const setScale = function (evt, explicitValue) {
+const setScale = (evt, explicitValue) => {
   let scaleValue;
   if (explicitValue) {
     scaleValue = `${explicitValue}%`;
@@ -72,7 +72,7 @@ const setScale = function (evt, explicitValue) {
 };
 
 //  Обработчики фильтров
-const getEffectValueString = function (effect, value) {
+const getEffectValueString = (effect, value) => {
   let output;
   if (effect !== `none`) {
     const effectObject = effectsMap[effect];
@@ -86,7 +86,7 @@ const getEffectValueString = function (effect, value) {
   return output;
 };
 
-const setSliderVisibility = function (effect) {
+const setSliderVisibility = (effect) => {
   if (effect === `none`) {
     effectsSliderNode.classList.add(`hidden`);
   } else if (effectsSliderNode.classList.contains(`hidden`)) {
@@ -94,7 +94,7 @@ const setSliderVisibility = function (effect) {
   }
 };
 
-const setEffectType = function (evt, explicitEffect) {
+const setEffectType = (evt, explicitEffect) => {
   let newEffect = explicitEffect ? explicitEffect : evt.target.value;
   imagePreview.className = `effects__preview--${newEffect}`;
   imagePreview.dataset.effect = newEffect;
@@ -105,23 +105,23 @@ const setEffectType = function (evt, explicitEffect) {
   setSliderVisibility(newEffect);
 };
 
-const setEffectValue = function (value) {
+const setEffectValue = (value) => {
   effectsValueNode.value = value;
 };
 
-const applyEffect = function () {
+const applyEffect = () => {
   const effect = imagePreview.dataset.effect;
   const value = effectsValueNode.value;
   imagePreview.style.filter = getEffectValueString(effect, value);
 };
 
-const movePin = function (mouseDownEvt) {
+const movePin = (mouseDownEvt) => {
   mouseDownEvt.preventDefault();
   const startPinOffsetX = effectsPinNode.offsetLeft;
   const maxOffsetX = effectsLineNode.offsetWidth;
   const startClientX = mouseDownEvt.clientX;
 
-  const onMouseMove = function (mouseMoveEvt) {
+  const onMouseMove = (mouseMoveEvt) => {
     mouseDownEvt.stopPropagation();
     const shiftX = mouseMoveEvt.clientX - startClientX;
     const newPinOffsetX = Math.min(Math.max(0, startPinOffsetX + shiftX), maxOffsetX);
@@ -130,7 +130,7 @@ const movePin = function (mouseDownEvt) {
     setEffectValue(Math.round((newPinOffsetX / maxOffsetX) * 100));
     applyEffect();
   };
-  const onMouseUp = function () {
+  const onMouseUp = () => {
     document.removeEventListener(`mousemove`, onMouseMove);
     document.removeEventListener(`mouseup`, onMouseUp);
   };
@@ -139,7 +139,7 @@ const movePin = function (mouseDownEvt) {
 };
 
 window.uploadForm.photoEdit = {
-  resetScale, resetEffects, resetSlider, resetForm,
+  resetScale, resetEffects, resetSlider, clearFormData,
   setScale, setEffectType, applyEffect, movePin,
 };
 
